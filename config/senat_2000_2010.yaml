@@ -1,0 +1,38 @@
+# Senat Speeches 2000-2010 Dataset
+# Filters: min 1000 chars, excludes "président de séance"
+
+pipeline:
+  date_range:
+    start: "2000-01-01"
+    end: "2010-12-31"
+  output_dir: "data"
+  log_level: "INFO"
+  max_workers: 4
+  http:
+    timeout: 30
+    max_retries: 3
+    retry_backoff: 2.0
+    rate_limit_delay: 1.0
+
+sources:
+  senat:
+    enabled: true
+    xml_url: "https://data.senat.fr/data/debats/cri.zip"
+
+processing:
+  unicode_normalize: "NFC"
+  strip_html: true
+  remove_boilerplate: true
+  min_text_length: 1000
+  dedupe_hash_algorithm: "xxhash64"
+  dedupe_fields:
+    - "text"
+  exclude_speaker_roles:
+    - "président de séance"
+
+export:
+  jsonl: true
+  parquet: true
+  generate_sources_md: true
+  manifest_checksums:
+    - "sha256"

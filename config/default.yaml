@@ -1,0 +1,51 @@
+# French Political Speeches Pipeline - Default Configuration
+
+pipeline:
+  date_range:
+    start: "2000-01-01"
+    end: "2010-12-31"
+  output_dir: "data"
+  log_level: "INFO"
+  max_workers: 4
+  http:
+    timeout: 30
+    max_retries: 3
+    retry_backoff: 2.0
+    rate_limit_delay: 1.0
+
+sources:
+  vie_publique:
+    enabled: true
+    manifest_url: "https://echanges.dila.gouv.fr/OPENDATA/DISCOURS_PUBLICS/vp_discours.json"
+    base_url: "https://www.vie-publique.fr"
+    crawl_full_text: true
+
+  senat:
+    enabled: true
+    xml_url: "https://data.senat.fr/data/debats/cri.zip"
+
+  assemblee:
+    enabled: true
+    base_url: "https://echanges.dila.gouv.fr/OPENDATA/Debats/AN/"
+    fallback_stub: true
+
+  europarl:
+    enabled: false  # OFF by default
+    portal_url: "https://data.europarl.europa.eu"
+    filter_country: "FR"
+
+processing:
+  unicode_normalize: "NFC"
+  strip_html: true
+  remove_boilerplate: true
+  min_text_length: 100
+  dedupe_hash_algorithm: "xxhash64"
+  dedupe_fields:
+    - "text"
+
+export:
+  jsonl: true
+  parquet: true
+  generate_sources_md: true
+  manifest_checksums:
+    - "sha256"
