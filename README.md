@@ -19,8 +19,8 @@ A reproducible data pipeline for collecting, cleaning, and exporting French poli
 git clone https://github.com/your-org/political-data-prep.git
 cd political-data-prep
 
-# Install with pip (development mode)
-pip install -e ".[dev]"
+# Install with pip
+pip install -e .
 ```
 
 ## Quick Start
@@ -117,34 +117,6 @@ The pipeline generates:
   "text_hash": "a1b2c3d4e5f6"
 }
 ```
-
-## Development
-
-```bash
-# Install dev dependencies
-pip install -e ".[dev]"
-
-# Run tests
-pytest
-
-# Type checking
-mypy src/
-
-# Linting
-ruff check src/
-```
-
-## Storage Requirements
-
-Estimated storage for a full run:
-
-| Component | Size |
-|-----------|------|
-| Vie-publique manifest | ~220 MB |
-| Vie-publique HTML pages | ~1-2 GB |
-| Senat XML | ~500 MB - 2 GB |
-| Curated output | ~1-3 GB |
-| **Total** | **~5-15 GB** |
 
 ## License
 
