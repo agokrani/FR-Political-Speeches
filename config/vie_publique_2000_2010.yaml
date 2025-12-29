@@ -1,11 +1,10 @@
-# Senat Speeches 2000-2010 Dataset
-# Filters: min 1000 chars, excludes "président de séance"
+# Vie Publique Speeches 2000-2010 Dataset
 
 pipeline:
   date_range:
     start: "2000-01-01"
     end: "2010-12-31"
-  output_dir: "data/senat"
+  output_dir: "data/vie_publique"
   log_level: "INFO"
   max_workers: 4
   http:
@@ -16,9 +15,9 @@ pipeline:
 
 sources:
   vie_publique:
-    enabled: false
-  senat:
     enabled: true
+  senat:
+    enabled: false
   assemblee:
     enabled: false
   europarl:
@@ -32,8 +31,6 @@ processing:
   dedupe_hash_algorithm: "xxhash64"
   dedupe_fields:
     - "text"
-  exclude_speaker_roles:
-    - "président de séance"
 
 export:
   jsonl: true

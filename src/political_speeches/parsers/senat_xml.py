@@ -236,7 +236,6 @@ class SenatXMLParser(BaseParser):
             license="Licence Ouverte",
             speaker_role=speaker_role,
             speech_type="intervention",
-            session_id=xml_path.stem,
         )
 
     def _get_element_text(self, elem: etree._Element) -> str:
@@ -400,7 +399,6 @@ class SenatXMLParser(BaseParser):
             license="Licence Ouverte",
             speaker_role=speaker_role,
             speech_type="intervention",
-            session_id=xml_path.stem,
         )
 
     def _parse_paragraphe(
@@ -431,7 +429,6 @@ class SenatXMLParser(BaseParser):
             lang="fr",
             license="Licence Ouverte",
             speech_type="intervention",
-            session_id=xml_path.stem,
         )
 
     def _parse_orateur_block(
@@ -471,7 +468,6 @@ class SenatXMLParser(BaseParser):
             lang="fr",
             license="Licence Ouverte",
             speech_type="intervention",
-            session_id=xml_path.stem,
         )
 
     def _extract_speaker(self, elem: etree._Element) -> Optional[str]:
