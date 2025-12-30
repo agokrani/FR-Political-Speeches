@@ -19,6 +19,8 @@ sources:
     enabled: false
   senat:
     enabled: true
+    xml_url: "https://data.senat.fr/data/debats/cri.zip"
+    base_url: "https://www.senat.fr/seances"
   assemblee:
     enabled: false
   europarl:
