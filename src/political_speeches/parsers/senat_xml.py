@@ -200,10 +200,15 @@ class SenatXMLParser(BaseParser):
         # Extract speaker role from 'qua' attribute (qualite)
         speaker_role = elem.get("qua", "").strip() or None
 
-        # Extract ID
-        source_id = elem.get("id", "")
-        if not source_id:
+        # Extract ID - prefix with filename to make globally unique
+        xml_id = elem.get("id", "")
+        if xml_id:
+            source_id = f"{xml_path.stem}_{xml_id}"
+        else:
             source_id = self._build_source_id(elem, xml_path, session_date)
+
+        # Build source URL
+        source_url = self._build_source_url(xml_path)
 
         # Extract text from <p> elements within the intervenant
         text_parts = []
@@ -224,13 +229,19 @@ class SenatXMLParser(BaseParser):
         # Clean up speaker name (remove trailing periods, normalize case)
         speaker = self._clean_speaker_name(speaker)
 
+        # Build title with speaker info
+        if speaker_role:
+            title = f"{speaker} ({speaker_role}) - Sénat - {session_date}"
+        else:
+            title = f"{speaker} - Sénat - {session_date}"
+
         return SpeechRecord(
             source="senat",
             source_id=source_id,
-            source_url=f"https://www.senat.fr/seances/{xml_path.stem}",
+            source_url=source_url,
             date=session_date,
             speaker=speaker,
-            title=f"Intervention - Sénat - {session_date}",
+            title=title,
             text=text,
             lang="fr",
             license="Licence Ouverte",
@@ -387,13 +398,19 @@ class SenatXMLParser(BaseParser):
                 speaker_role = role_elem.text.strip()
                 break
 
+        # Build title with speaker info
+        if speaker_role:
+            title = f"{speaker} ({speaker_role}) - Sénat - {intervention_date}"
+        else:
+            title = f"{speaker} - Sénat - {intervention_date}"
+
         return SpeechRecord(
             source="senat",
             source_id=source_id,
-            source_url=f"https://www.senat.fr/seances/{xml_path.stem}",
+            source_url=self._build_source_url(xml_path),
             date=intervention_date,
             speaker=speaker,
-            title=f"Intervention - Sénat - {intervention_date}",
+            title=title,
             text=text,
             lang="fr",
             license="Licence Ouverte",
@@ -422,9 +439,10 @@ class SenatXMLParser(BaseParser):
         return SpeechRecord(
             source="senat",
             source_id=source_id,
+            source_url=self._build_source_url(xml_path),
             date=session_date,
             speaker=speaker,
-            title=f"Intervention - Sénat - {session_date}",
+            title=f"{speaker} - Sénat - {session_date}",
             text=text,
             lang="fr",
             license="Licence Ouverte",
@@ -461,9 +479,10 @@ class SenatXMLParser(BaseParser):
         return SpeechRecord(
             source="senat",
             source_id=source_id,
+            source_url=self._build_source_url(xml_path),
             date=session_date,
             speaker=speaker,
-            title=f"Intervention - Sénat - {session_date}",
+            title=f"{speaker} - Sénat - {session_date}",
             text=text,
             lang="fr",
             license="Licence Ouverte",
@@ -504,14 +523,18 @@ class SenatXMLParser(BaseParser):
     def _build_source_id(
         self, elem: etree._Element, xml_path: Path, session_date: Optional[date]
     ) -> str:
-        """Build a unique source ID."""
-        # Use existing ID if available
+        """Build a unique source ID.
+
+        Always prefixes with filename stem to ensure global uniqueness.
+        """
+        base = xml_path.stem
+
+        # Use existing ID if available (prefixed with filename)
         for attr in ["id", "identifiant", "uid"]:
             if attr in elem.attrib:
-                return elem.attrib[attr]
+                return f"{base}_{elem.attrib[attr]}"
 
         # Generate from filename and position
-        base = xml_path.stem
         # Use sourceline if available (lxml feature)
         line = getattr(elem, "sourceline", None)
         if line:
@@ -522,3 +545,14 @@ class SenatXMLParser(BaseParser):
             return f"{base}_{session_date.isoformat()}"
 
         return f"{base}_unknown"
+
+    def _build_source_url(self, xml_path: Path) -> str:
+        """Build the source URL for a session.
+
+        Converts filename like d20161006 to URL:
+        https://www.senat.fr/seances/s201610/s20161006/st20161006000.html
+        """
+        date_str = xml_path.stem[1:]  # Remove 'd' prefix -> "20161006"
+        year_month = date_str[:6]  # "201610"
+        base_url = self.config.sources.senat.base_url
+        return f"{base_url}/s{year_month}/s{date_str}/st{date_str}000.html"

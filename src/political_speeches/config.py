@@ -43,8 +43,7 @@ class SenatConfig(BaseModel):
 
     enabled: bool = True
     xml_url: str = "https://data.senat.fr/data/debats/cri.zip"
-    # Alternative PostgreSQL dump URL (not used by default)
-    dump_url: str = "https://data.senat.fr/data/debats/debats.zip"
+    base_url: str = "https://www.senat.fr/seances"
 
 
 class AssembleeConfig(BaseModel):
